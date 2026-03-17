@@ -1,0 +1,159 @@
+{
+  "name": "Tugas 2 PAITK",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "3b39442e-bdb9-4740-bfa9-aaf5058fcae5",
+      "name": "Chat Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        464
+      ]
+    },
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Halo! 👋  \nSaya adalah Nay, chatbot yang siap membantu Anda menemukan informasi tentang program pelatihan dan harganya.\n\nAnda bisa bertanya seperti:\n• “Apa saja program pelatihan yang tersedia?”\n• “Berapa harga program bootcamp?”\n• “Program paling murah apa?”\n• “Jelaskan tentang program tertentu”\n\nSilakan ketik pertanyaan Anda ya 😊",
+        "options": {}
+      },
+      "id": "68ae559b-2dd7-49f7-8378-e8dcdfb9ecf1",
+      "name": "Chat Trigger",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1,
+      "position": [
+        -336,
+        224
+      ],
+      "webhookId": "c174c89d-5818-4aa2-8f16-1b01b5186e33"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1SfwMYAdM5O_9sX7V8ZJeeRM0WTbW2tzEtmIPPJbBgFk",
+          "mode": "list",
+          "cachedResultName": "Salinan dari n8n 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SfwMYAdM5O_9sX7V8ZJeeRM0WTbW2tzEtmIPPJbBgFk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SfwMYAdM5O_9sX7V8ZJeeRM0WTbW2tzEtmIPPJbBgFk/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        176,
+        448
+      ],
+      "id": "6dfe7cd5-6f40-4644-bfff-6b27211a25a4",
+      "name": "Get row(s) in sheet in Google Sheets1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3Qi3tNJHS4M8bvgp",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "Anda adalah AI Assistant yang berperan sebagai asisten informasi program pelatihan. Tugas Anda adalah membantu pengguna dalam menjawab pertanyaan yang berkaitan dengan nama program pelatihan, jenis program, deskripsi, serta harga atau biaya berdasarkan data yang tersedia di Google Sheets. Gunakan data tersebut sebagai sumber utama jawaban dan jangan mengarang informasi di luar data. Berikan jawaban yang jelas, singkat, dan mudah dipahami. Jika pengguna meminta rekomendasi, bantu dengan memberikan pilihan terbaik berdasarkan data yang tersedia. Jika informasi yang ditanyakan tidak ditemukan, jawab dengan sopan bahwa data tidak tersedia."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -128,
+        224
+      ],
+      "id": "c45b408e-7e45-4ce4-b293-31796bf54664",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        464
+      ],
+      "id": "9472c13b-75cc-4b14-98f8-0e2c031bcca1",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "B8R2ApzL1y2dsEM8",
+          "name": "Google Gemini(PaLM) Api account 3"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chat Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet in Google Sheets1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "c355e212-de92-4291-940f-c157aaa31124",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8245a2580fc9362fa7470046e3797aa2e5889c02a5a13ee3e72811b93aca1132"
+  },
+  "id": "ujSQFU1qb25r8Mf9",
+  "tags": []
+}
