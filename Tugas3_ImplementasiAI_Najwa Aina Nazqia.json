@@ -1,0 +1,315 @@
+{
+  "name": "Tugas 3 Implementasi AI",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Generate Video Konten Otomatis",
+        "formDescription": "Isi informasi dibawah ini untuk memulai proses generate video",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "prompt"
+            },
+            {
+              "fieldLabel": "img_url"
+            },
+            {
+              "fieldLabel": "task_type"
+            },
+            {
+              "fieldLabel": "api_key"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        -1392,
+        -32
+      ],
+      "id": "aca9b914-a74e-44be-8956-579a89663201",
+      "name": "On form submission",
+      "webhookId": "3a20f651-fcca-4c1b-8d7b-b64e7de0814a"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.kie.ai/api/v1/jobs/createTask",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.api_key }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"grok-imagine/image-to-video\",\n  \"input\": {\n    \"image_urls\": [\n      \"{{$json.img_url}}\"\n    ],\n    \"prompt\": \"{{$json.prompt}}\",\n    \"mode\": \"normal\",\n    \"duration\": \"6\",\n    \"resolution\": \"480p\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1136,
+        -32
+      ],
+      "id": "49cea475-dd58-4b49-b279-a26d9f4ebc63",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "amount": 20
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -928,
+        -32
+      ],
+      "id": "d31bf50f-8780-410d-9920-b7210b13f3fa",
+      "name": "Wait",
+      "webhookId": "ace18129-0426-4eee-983f-a060cbb9cf71"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.kie.ai/api/v1/jobs/recordInfo",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "taskId",
+              "value": "={{ $json.data.taskId }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "=application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('On form submission').item.json.api_key }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -720,
+        -32
+      ],
+      "id": "d07f18ed-7fc6-4164-8eea-58404390ec51",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "fc76e2bb-44ac-427a-be9d-bc33810aaeb4",
+              "leftValue": "=success",
+              "rightValue": "={{ $json.data.state }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -512,
+        -32
+      ],
+      "id": "f9535738-fbf3-4380-8a9d-b27e643078a8",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsCode": "const result = JSON.parse($json.data.resultJson);\n\nreturn [{\n  videoUrl: result.resultUrls?.[0] || null\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -304,
+        -48
+      ],
+      "id": "9db945cb-434a-40d1-a295-fb15886d4ca2",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "url": "={{$json.videoUrl}}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "e0346fea-d234-49ab-812c-b4a5f7782896",
+      "name": "Download Gambar",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        -112,
+        -48
+      ]
+    },
+    {
+      "parameters": {
+        "name": "Video Topik 3",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1bE0NGhkcEinlXuRx_19Wq8Ow2VgCuIi9",
+          "mode": "list",
+          "cachedResultName": "Hasil Topik 2 dan 3",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1bE0NGhkcEinlXuRx_19Wq8Ow2VgCuIi9"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        80,
+        -48
+      ],
+      "id": "b785fbe8-1784-44a0-8d4f-bedb44164c2e",
+      "name": "Upload file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "llA0uYFOCjOo4yMM",
+          "name": "Google Drive account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Download Gambar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Gambar": {
+      "main": [
+        [
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "feea753f-8bf2-404c-b56a-6c8bbbc46189",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "65a80bf894dde6a2e334b2ee0267a99319ca2ddfd386565c9ff757b64700ae8b"
+  },
+  "id": "UhuQuqGNAoR8Ybm3",
+  "tags": []
+}
